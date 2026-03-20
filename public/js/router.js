@@ -24,8 +24,7 @@ function toggleMenu() {
     var h = '<button class="menu-item" onclick="menuNav(\'#/home\')"><span class="mi-icon">&#127919;</span>Profiling</button>'
       + '<button class="menu-item" onclick="menuNav(\'#/results\')"><span class="mi-icon">&#128203;</span>Results</button>';
     if (isManager) {
-      h += '<button class="menu-item" onclick="menuNav(\'#/manage-accounts\')"><span class="mi-icon">&#128101;</span>Manage Accounts</button>'
-        + '<button class="menu-item" onclick="menuNav(\'#/roles\')"><span class="mi-icon">&#128272;</span>Role Settings</button>';
+      h += '<button class="menu-item" onclick="menuNav(\'#/manage-accounts\')"><span class="mi-icon">&#128101;</span>Manage Accounts</button>';
     }
     h += '<button class="menu-item" onclick="menuNav(\'#/account\')"><span class="mi-icon">&#9881;</span>Account Settings</button>'
       + '<div class="menu-sep"></div>'
@@ -109,7 +108,7 @@ async function route() {
   }
 
   // Manager-only guard
-  if ((hash === "#/manage-accounts" || hash === "#/roles") && currentProfile.role !== "manager") {
+  if (hash === "#/manage-accounts" && currentProfile.role !== "manager") {
     location.hash = "#/home";
     return;
   }
@@ -124,9 +123,6 @@ async function route() {
   } else if (hash === "#/manage-accounts") {
     inProfileFlow = false;
     renderManageAccounts();
-  } else if (hash === "#/roles") {
-    inProfileFlow = false;
-    renderRoleSettings();
   } else {
     location.hash = "#/home";
   }

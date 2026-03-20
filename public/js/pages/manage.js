@@ -52,51 +52,7 @@ async function renderManageAccounts() {
   renderHeaderRight();
 }
 
-// ── ROLE SETTINGS ──
-function renderRoleSettings() {
-  document.getElementById("prg").style.display = "none";
-  document.getElementById("hSub").textContent = "Role Settings";
 
-  var h = '<span class="ey">Role Configuration</span>'
-
-    + '<div class="card">'
-    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
-    + '<span style="font-size:22px">&#128188;</span>'
-    + '<div>'
-    + '<div style="font-size:15px;font-weight:700;font-family:sans-serif">Advisor</div>'
-    + '<div style="font-size:11px;color:var(--mu);font-family:sans-serif">Default role for all sign-ups</div>'
-    + '</div></div>'
-    + '<div style="font-size:12px;color:var(--mu);font-family:sans-serif;line-height:1.8">'
-    + '&#10003; Profile prospects (DISC + MBTI)<br>'
-    + '&#10003; Save results to database<br>'
-    + '&#10003; View & manage own results<br>'
-    + '&#10003; Export PDF & CSV<br>'
-    + '&#10003; Edit own account details'
-    + '</div></div>'
-
-    + '<div class="card" style="border-color:rgba(26,95,138,.3)">'
-    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
-    + '<span style="font-size:22px">&#128081;</span>'
-    + '<div>'
-    + '<div style="font-size:15px;font-weight:700;font-family:sans-serif">Manager</div>'
-    + '<div style="font-size:11px;color:var(--mu);font-family:sans-serif">Promoted via Manage Accounts</div>'
-    + '</div></div>'
-    + '<div style="font-size:12px;color:var(--mu);font-family:sans-serif;line-height:1.8">'
-    + '&#10003; Everything an Advisor can do<br>'
-    + '&#10003; View all advisors\' results<br>'
-    + '&#10003; View all registered accounts<br>'
-    + '&#10003; Access role settings page'
-    + '</div></div>'
-
-    + '<div class="card" style="background:rgba(201,168,76,.06);border-color:rgba(201,168,76,.2)">'
-    + '<span class="ey">How to Change Roles</span>'
-    + '<div style="font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.7">'
-    + 'Go to <strong>Manage Accounts</strong> from the menu. Each user card has a button to promote or demote them.'
-    + '</div></div>';
-
-  document.getElementById("app").innerHTML = h;
-  renderHeaderRight();
-}
 
 // ── CHANGE USER ROLE ──
 async function changeRole(userId, newRole) {
