@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0D1B2A">
+<title>Prospect Profiler</title>
+<style>
+:root{--gold:#C9A84C;--gl:#E8C96A;--dk:#0D1B2A;--tx:#F0EAD6;--mu:#8A8070;--D:#C0392B;--I:#D4680A;--S:#1A7A40;--C:#1A5F8A}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--dk);color:var(--tx);font-family:Georgia,serif}
+#hdr{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(10,18,30,.98);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 16px 8px;text-align:center}
+.hl{font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-family:sans-serif}
+.ht{font-size:17px;font-weight:normal;margin:2px 0}
+.hs{font-size:10px;color:var(--mu);font-family:sans-serif}
+#prg{position:fixed;top:60px;left:0;right:0;z-index:49;background:rgba(13,27,42,.98);padding:7px 16px 5px}
+.pm{display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px;color:var(--mu);font-family:sans-serif}
+.pt{height:2px;background:rgba(255,255,255,.1);border-radius:2px}
+.pf{height:100%;background:linear-gradient(90deg,var(--gold),var(--gl));border-radius:2px;transition:width .4s}
+#app{padding:80px 15px 100px;min-height:100vh}
+#bot{position:fixed;bottom:0;left:0;right:0;padding:10px 15px;background:rgba(10,18,30,.98);border-top:1px solid rgba(255,255,255,.08);display:flex;gap:9px;z-index:50}
+.bbk{padding:13px 17px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--mu);font-family:sans-serif;font-size:14px;cursor:pointer;flex-shrink:0}
+.bnx{flex:1;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),var(--gl));color:#1A1200;font-family:sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+.bnx:disabled{opacity:.35}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:17px 15px;margin-bottom:12px}
+.ey{font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-family:sans-serif;margin-bottom:6px;display:block}
+.lbl{font-size:10px;letter-spacing:2px;color:var(--mu);text-transform:uppercase;font-family:sans-serif;display:block;margin-bottom:5px;margin-top:10px}
+input,select{width:100%;padding:12px 13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:10px;color:var(--tx);font-size:15px;font-family:sans-serif;outline:none;-webkit-appearance:none}
+input::placeholder{color:var(--mu)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath fill='%23C9A84C' d='M5 7L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+select option{background:#0D1B2A}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.ptag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-family:sans-serif;margin-bottom:6px}
+.po{background:rgba(41,128,185,.15);border:1px solid rgba(41,128,185,.4);color:#5BA4CF}
+.pd{background:rgba(26,120,64,.15);border:1px solid rgba(26,120,64,.4);color:#5BAE7A}
+.qtip{font-size:12px;color:var(--mu);font-family:sans-serif;line-height:1.5;margin-bottom:7px}
+.qask{padding:9px 12px;border-radius:8px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);font-size:13px;color:var(--gold);font-family:sans-serif;line-height:1.5;margin-bottom:10px}
+.qask::before{content:"Say: ";font-weight:700}
+.opt{padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.opt.sD{border-color:var(--D);background:rgba(192,57,43,.12)}
+.opt.sI{border-color:var(--I);background:rgba(212,104,10,.12)}
+.opt.sS{border-color:var(--S);background:rgba(26,122,64,.12)}
+.opt.sC{border-color:var(--C);background:rgba(26,95,138,.12)}
+.rc{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.rd{width:7px;height:7px;border-radius:50%;background:#fff;display:none}
+.opt.sD .rc{border-color:var(--D);background:var(--D)}
+.opt.sI .rc{border-color:var(--I);background:var(--I)}
+.opt.sS .rc{border-color:var(--S);background:var(--S)}
+.opt.sC .rc{border-color:var(--C);background:var(--C)}
+.opt.sD .rd,.opt.sI .rd,.opt.sS .rd,.opt.sC .rd{display:block}
+.otx{font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.5;flex:1}
+.opt.sD .otx,.opt.sI .otx,.opt.sS .otx,.opt.sC .otx{color:var(--tx)}
+.dbg{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;font-family:sans-serif;white-space:nowrap;margin-top:1px;display:none}
+.opt.sD .dbg{display:block;background:rgba(192,57,43,.2);color:var(--D)}
+.opt.sI .dbg{display:block;background:rgba(212,104,10,.2);color:var(--I)}
+.opt.sS .dbg{display:block;background:rgba(26,122,64,.2);color:var(--S)}
+.opt.sC .dbg{display:block;background:rgba(26,95,138,.2);color:var(--C)}
+.nvi{padding:11px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);display:flex;align-items:flex-start;gap:10px;margin-bottom:7px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.nvi.ckD{border-color:var(--D);background:rgba(192,57,43,.09)}
+.nvi.ckI{border-color:var(--I);background:rgba(212,104,10,.09)}
+.nvi.ckS{border-color:var(--S);background:rgba(26,122,64,.09)}
+.nvi.ckC{border-color:var(--C);background:rgba(26,95,138,.09)}
+.cb{width:20px;height:20px;border-radius:5px;border:2px solid rgba(255,255,255,.2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.nvi.ckD .cb{background:var(--D);border-color:var(--D)}
+.nvi.ckI .cb{background:var(--I);border-color:var(--I)}
+.nvi.ckS .cb{background:var(--S);border-color:var(--S)}
+.nvi.ckC .cb{background:var(--C);border-color:var(--C)}
+.srow{margin-bottom:9px}
+.slr{display:flex;justify-content:space-between;margin-bottom:3px}
+.sl{font-size:12px;font-weight:700;font-family:sans-serif}
+.sp{font-size:11px;color:var(--mu);font-family:sans-serif}
+.str{height:7px;background:rgba(255,255,255,.07);border-radius:4px}
+.sfill{height:100%;border-radius:4px;transition:width .6s}
+.trwp{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.trp{padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;font-family:sans-serif}
+.ddg{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.doc{border-radius:12px;padding:12px 11px;border:1px solid rgba(26,122,64,.3);background:rgba(26,122,64,.07)}
+.dnt{border-radius:12px;padding:12px 11px;border:1px solid rgba(192,57,43,.3);background:rgba(192,57,43,.07)}
+.ddt{font-size:9px;font-weight:700;font-family:sans-serif;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px}
+.ddt.gn{color:#1A7A40}.ddt.rd2{color:#C0392B}
+.di{font-size:11px;color:#B8D4B8;font-family:sans-serif;line-height:1.5;margin-bottom:5px;padding-left:14px;position:relative}
+.di::before{content:"\2713";color:#1A7A40;position:absolute;left:0}
+.dn{font-size:11px;color:#D4B8B8;font-family:sans-serif;line-height:1.5;margin-bottom:5px;padding-left:14px;position:relative}
+.dn::before{content:"\2717";color:#C0392B;position:absolute;left:0}
+.wbox{padding:11px 13px;border-radius:9px;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.25);margin-top:10px}
+.wlbl{font-size:9px;letter-spacing:2px;color:#C0392B;text-transform:uppercase;font-family:sans-serif;margin-bottom:4px;font-weight:700}
+.wtx{font-size:12px;color:#D4B8B8;font-family:sans-serif;line-height:1.6}
+.fup{font-size:13px;color:#C8C0B0;font-family:sans-serif;line-height:1.7}
+.abg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.abtn{padding:14px 10px;border-radius:12px;border:none;font-family:sans-serif;font-size:12px;font-weight:700;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.abtn .ai{font-size:20px}
+.ab-pdf{background:linear-gradient(135deg,#1A5F8A,#2471A3);color:#fff}
+.ab-csv{background:linear-gradient(135deg,#1A7A40,#229954);color:#fff}
+.anotes{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--mu);font-family:sans-serif;font-size:13px;cursor:pointer;margin-bottom:10px}
+.arst{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--mu);font-family:sans-serif;font-size:13px;cursor:pointer;margin-top:4px;margin-bottom:24px}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:flex-end}
+.mbg.on{display:flex}
+.mbox{background:#182638;border-radius:18px 18px 0 0;padding:20px 16px 36px;width:100%}
+textarea{width:100%;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:var(--tx);font-size:14px;font-family:sans-serif;outline:none;resize:vertical;min-height:90px;margin-bottom:11px}
+.m2{display:flex;gap:9px}
+.mcan{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--mu);font-family:sans-serif;font-size:14px;cursor:pointer}
+.msav{flex:1;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),var(--gl));color:#1A1200;font-family:sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:#182638;border:1px solid rgba(201,168,76,.4);border-radius:20px;padding:9px 18px;font-size:13px;color:var(--gold);font-family:sans-serif;z-index:300;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.toast.on{opacity:1}
+.rph{display:none;text-align:center;padding-bottom:14px;border-bottom:2px solid #C9A84C;margin-bottom:16px}
+@media print{
+  #hdr,#prg,#bot,.mbg,.toast,.abg,.anotes,.arst{display:none!important}
+  #app{padding:0!important}
+  body{background:#fff!important;color:#111!important;font-family:Arial,sans-serif!important}
+  .rph{display:block!important}
+  @page{margin:12mm;size:A4}
+}
+</style>
+</head>
+<body>
+<div id="hdr">
+  <div class="hl">FA Toolkit &middot; Singapore</div>
+  <div class="ht">Prospect Profiler</div>
+  <div class="hs" id="hSub">DISC &times; MBTI &middot; Auto-Profile</div>
+</div>
+<div id="prg" style="display:none">
+  <div class="pm"><span id="sLbl">Step 1</span><span style="color:var(--gold)" id="pcLbl">0%</span></div>
+  <div class="pt"><div class="pf" id="pFill" style="width:0%"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="mbg" id="mbg" onclick="if(event.target===this)this.classList.remove('on')">
+  <div class="mbox">
+    <div style="font-size:15px;margin-bottom:4px">Add Notes</div>
+    <div style="font-size:12px;color:var(--mu);font-family:sans-serif;margin-bottom:13px">Objections, personal details, follow-up actions.</div>
+    <textarea id="nta" placeholder="E.g. Wife handles finances. Interested in CI cover..."></textarea>
+    <div class="m2">
+      <button class="mcan" onclick="document.getElementById('mbg').classList.remove('on')">Cancel</button>
+      <button class="msav" onclick="saveNotes()">Save Notes</button>
+    </div>
+  </div>
+</div>
+<div id="app"></div>
+<div id="bot"></div>
+
+<script>
+
+// ── DATA ──
+var QS=[
+  {ph:"open",tip:"How they answer reveals Extravert vs Introvert straight away.",
+   ask:"Weekend how? Got plans or just stone at home?",
+   opts:[{t:"Out with friends, events, always something on",d:"I",mb:{k:"EI",v:"E"}},
+         {t:"Chill at home, rest, family time",d:"S",mb:{k:"EI",v:"I"}},
+         {t:"Side project, gym, always productive",d:"D",mb:{k:"JP",v:"J"}},
+         {t:"Research, read, sort things out",d:"C",mb:{k:"JP",v:"P"}}]},
+  {ph:"open",tip:"People person vs solo reveals trust-building approach needed.",
+   ask:"You prefer working with people or doing things on your own?",
+   opts:[{t:"Love working with others, energy from team",d:"I",mb:{k:"EI",v:"E"}},
+         {t:"Prefer to figure things out alone first",d:"C",mb:{k:"EI",v:"I"}},
+         {t:"Lead the team, delegate, outcome matters most",d:"D",mb:{k:"TF",v:"T"}},
+         {t:"Work together but care a lot about how people feel",d:"S",mb:{k:"TF",v:"F"}}]},
+  {ph:"open",tip:"How they share wins reveals core driver and confidence level.",
+   ask:"What is something you are proud of lately - work or personal?",
+   opts:[{t:"Shares boldly - results, numbers, achievements",d:"D",mb:{k:"EI",v:"E"}},
+         {t:"Gets excited telling story - people, journey, feelings",d:"I",mb:{k:"EI",v:"E"}},
+         {t:"Modest - credits family or team more than self",d:"S",mb:{k:"TF",v:"F"}},
+         {t:"Talks about completing something properly",d:"C",mb:{k:"TF",v:"T"}}]},
+  {ph:"open",tip:"Core work motivation = core DISC driver. This tells you the pitch language to use.",
+   ask:"At work, what actually gets you fired up?",
+   opts:[{t:"Winning, hitting targets, being the best",d:"D",mb:{k:"TF",v:"T"}},
+         {t:"The people, vibes, recognition, team energy",d:"I",mb:{k:"TF",v:"F"}},
+         {t:"Stability, good teammates, knowing what to expect",d:"S",mb:{k:"SN",v:"S"}},
+         {t:"Doing things properly, quality, getting details right",d:"C",mb:{k:"SN",v:"N"}}]},
+  {ph:"discover",tip:"How they ended up in their career = how they make big life decisions.",
+   ask:"How did you end up in your current job? Was it planned or just happened?",
+   opts:[{t:"Deliberately chose it, switched industries - intentional",d:"D",mb:{k:"SN",v:"N"}},
+         {t:"Fell into it through people and connections",d:"I",mb:{k:"SN",v:"N"}},
+         {t:"Comfortable, grew into it, not shaking things up",d:"S",mb:{k:"SN",v:"S"}},
+         {t:"Researched, compared options, made a logical choice",d:"C",mb:{k:"SN",v:"S"}}]},
+  {ph:"discover",tip:"Real passion reveals personality more honestly than any direct question.",
+   ask:"Outside work, what do you actually enjoy? What will you always make time for?",
+   opts:[{t:"Social - gatherings, events, meeting new people",d:"I",mb:{k:"EI",v:"E"}},
+         {t:"Family time, quiet hobbies, community stuff",d:"S",mb:{k:"TF",v:"F"}},
+         {t:"Achievement hobbies - sports, competition, building things",d:"D",mb:{k:"TF",v:"T"}},
+         {t:"Investing, tech, learning, researching",d:"C",mb:{k:"SN",v:"N"}}]},
+  {ph:"discover",tip:"Planner vs spontaneous = Judging vs Perceiving. Critical for structuring your proposal.",
+   ask:"You the type who plans everything or more just go with the flow?",
+   opts:[{t:"Plan everything - itinerary, budget, calendar sorted",d:"C",mb:{k:"JP",v:"J"}},
+         {t:"Spontaneous - boring to over-plan, see how first",d:"D",mb:{k:"JP",v:"P"}},
+         {t:"Some planning but flexible, not too rigid",d:"S",mb:{k:"JP",v:"J"}},
+         {t:"Depends, but I like knowing what is ahead",d:"I",mb:{k:"JP",v:"P"}}]},
+  {ph:"discover",tip:"Their real money worry = your emotional anchor for the whole conversation.",
+   ask:"If you honest with me - what is the one money thing at the back of your mind?",
+   opts:[{t:"Income protection - what if something happens to me",d:"S",mb:{k:"TF",v:"F"}},
+         {t:"Not growing fast enough, missing good opportunities",d:"D",mb:{k:"SN",v:"N"}},
+         {t:"Specific gap - numbers feel off, coverage not right",d:"C",mb:{k:"TF",v:"T"}},
+         {t:"General anxiety - do not know where to start, feel behind",d:"I",mb:{k:"TF",v:"F"}}]}
+]
+
+var NVG=[
+  {em:"&#129306;",tt:"First 30 Seconds",st:"Arrival, greeting, first impression",items:[
+    {id:"a1",t:"Firm brief handshake - one pump, done",d:"D"},{id:"a2",t:"Warm handshake, two hands or touched arm",d:"I"},
+    {id:"a3",t:"Gentle moderate grip, pleasant not a power move",d:"S"},{id:"a4",t:"Precise measured grip, just right pressure",d:"C"},
+    {id:"a5",t:"Arrived early, came with notes or agenda",d:"C"},{id:"a6",t:"On time but still finishing a call or WhatsApp",d:"I"},
+    {id:"a7",t:"Sharp status-signalling outfit, power dressing",d:"D"},{id:"a8",t:"Colourful, expressive, on-trend clothing",d:"I"},
+    {id:"a9",t:"Comfortable classic understated - nothing flashy",d:"S"},{id:"a10",t:"Smart but functional, neat and conservative",d:"C"}]},
+  {em:"&#128697;",tt:"Posture & Energy",st:"How they sit and carry themselves",items:[
+    {id:"b1",t:"Leans forward, takes up space confidently",d:"D"},{id:"b2",t:"Sits close, animated, comfortable with small distance",d:"I"},
+    {id:"b3",t:"Slight angle, non-confrontational and calm",d:"S"},{id:"b4",t:"Sits slightly back, needs intellectual space",d:"C"},
+    {id:"b5",t:"Arms crossed but body faces you - assertive not cold",d:"D"},{id:"b6",t:"Arms open, relaxed, genuinely warm",d:"S"},
+    {id:"b7",t:"Very still, controlled posture, minimal fidgeting",d:"C"},{id:"b8",t:"Checks phone or watch when conversation drags",d:"D"},
+    {id:"b9",t:"Taps fingers or table when things slow down",d:"D"}]},
+  {em:"&#128065;",tt:"Eye Contact & Face",st:"What their face and eyes are communicating",items:[
+    {id:"c1",t:"Strong direct eye contact, holds your gaze",d:"D"},{id:"c2",t:"Frequent warm eye contact, breaks away to scan room",d:"I"},
+    {id:"c3",t:"Soft steady eye contact, caring not challenging",d:"S"},{id:"c4",t:"Intermittent, looks away while thinking",d:"C"},
+    {id:"c5",t:"Minimal facial animation, neutral focused expression",d:"D"},{id:"c6",t:"Very animated face, eyebrows move, reactions visible",d:"I"},
+    {id:"c7",t:"Pleasant subdued smile, genuine not performative",d:"S"},{id:"c8",t:"Slight frown while thinking - concentration not displeasure",d:"C"},
+    {id:"c9",t:"Laughs easily, even at own jokes",d:"I"}]},
+  {em:"&#128483;",tt:"How They Speak",st:"Pace, tone and the questions they ask",items:[
+    {id:"d1",t:"Fast pace, every word deliberate, no filler words",d:"D"},{id:"d2",t:"Fast-medium, enthusiastic bursts, may trail off",d:"I"},
+    {id:"d3",t:"Slow measured, pauses before answering",d:"S"},{id:"d4",t:"Slow and precise, every word carefully chosen",d:"C"},
+    {id:"d5",t:"Direct: What's the return? What's the catch?",d:"D"},{id:"d6",t:"Open: What do people usually do? What's the story?",d:"I"},
+    {id:"d7",t:"Soft: What would happen if...? Is it safe to...?",d:"S"},{id:"d8",t:"Precise: Where does that figure come from?",d:"C"},
+    {id:"d9",t:"Takes notes or asks to note things down",d:"C"}]},
+  {em:"&#128247;",tt:"How They React to You",st:"Observable in any cafe, lobby or meeting room",items:[
+    {id:"e1",t:"Cuts your intro short - gets to the point themselves",d:"D"},
+    {id:"e2",t:"Asks about you first before talking about themselves",d:"I"},
+    {id:"e3",t:"Lets you finish every sentence, does not interrupt",d:"S"},
+    {id:"e4",t:"Asks a clarifying question before answering yours",d:"C"},
+    {id:"e5",t:"Phone face down or fully away the whole meeting",d:"D"},
+    {id:"e6",t:"Phone on table, glances at notifications casually",d:"I"},
+    {id:"e7",t:"Phone away, fully present, unhurried energy",d:"S"},
+    {id:"e8",t:"Pulled out pen or opened notes app to write things down",d:"C"},
+    {id:"e9",t:"Ordered quickly and decisively - no deliberating",d:"D"},
+    {id:"e10",t:"Chatted with server or made a comment about the place",d:"I"},
+    {id:"e11",t:"Polite and patient with service staff, no fuss",d:"S"},
+    {id:"e12",t:"Asked what something contained before ordering",d:"C"},
+    {id:"e13",t:"Bag or wallet is premium, functional, low-key status",d:"D"},
+    {id:"e14",t:"Accessories expressive - phone case, bag has personality",d:"I"},
+    {id:"e15",t:"Brought something practical - notebook, folder, name cards",d:"C"},
+    {id:"e16",t:"Reacted warmly when family or personal topic came up",d:"S"}]}
+];
+
+var PR={
+  D:{nm:"Dominant",em:"&#127919;",col:"#C0392B",
+    sg:"This one damn bo chup the process - they want the answer not the story. Talk results, talk outcome, talk ROI. Waste their time and they will paiseh-ghost you quietly.",
+    op:'"Eh, I will be straight with you - I looked at your situation and there are two things we can lock in today that will make a real difference. Can I show you?"',
+    mb:"Usually ESTJ, ENTJ or ESTP",
+    tr:["Direct","Results-driven","Decisive","Competitive","Fast-paced"],
+    dos:["Get to the point fast - no fluff, no warm-up","Lead with outcome and numbers: how much, by when","Give them control - let them feel they are deciding","Be confident and direct, not eager to please","Keep meetings short and purposeful"],
+    dnts:["Do not do long intros - they will check out","Never be wishy-washy - maybe and see-how kills credibility","Do not over-explain unless they specifically ask","Do not be submissive - they want a peer not an order-taker"],
+    st:"Fast, outcome-focused, minimal filler. Be confident. Let them feel in control of the decision at all times.",
+    wf:"Checks phone or watch? Losing them - cut to value NOW. Goes very quiet? Ask a direct question. Starts wrapping up early? Close with a clear next step before they leave.",
+    fu:"WhatsApp is fine. Keep it short. Eh [Name], following up on what we discussed. Here is what I need from you to proceed. They respect efficiency above all.",
+    msgs:{
+      engage:{lbl:"Engage & Open",items:[
+        "Eh [Name], straight to it — I saw one gap in what you shared that most people your age overlook until it is too late. Worth 10 minutes to hear it?",
+        "Based on what you told me, I can show you exactly how much you are leaving on the table right now. Numbers ready — when are you free?",
+        "I will not waste your time. What I have for you is specific to your situation, not a generic plan. Give me one shot to show you.",
+        "You mentioned [goal]. I have seen people at your stage either lock that in or lose it completely depending on one decision. Let me show you which side you are on.",
+        "I respect that you are busy. This will take 30 minutes max and I promise you will leave with something useful even if you decide not to move forward.",
+      ]},
+      appt:{lbl:"Set Next Appointment",items:[
+        "Eh [Name], I have what you need ready. Are you free [Day] at [Time] or [Alt Day]? Pick one and I will confirm.",
+        "Next step — I want to show you the actual numbers. 30 minutes, your call on when. What works this week?",
+        "I have blocked some time [Day] afternoon for you. Does that work or do you need me to shift?",
+        "Let us lock in the next meeting now while we are here. [Day] or [Alt Day] — which one?",
+        "I will send you a calendar invite. If the time does not work, just tell me and I will adjust immediately.",
+      ]},
+      followup:{lbl:"Follow-Up Messages",items:[
+        "Eh [Name]. Following up on what we discussed. Here is what I need from you to get this moving: [action]. Can you get that to me by [date]?",
+        "[Name], just checking — did you get a chance to look at what I sent? Let me know if anything needs clarification.",
+        "Quick update — I ran the numbers based on our chat. The picture is clear. When can we meet to go through it?",
+        "[Name], one thing I forgot to mention that is relevant to you: [point]. Worth a quick call this week?",
+        "Still keen to help you lock this in before [deadline]. Ball is in your court — let me know.",
+      ]},
+      objections:{lbl:"Handle Objections",items:[
+        "WANT TO THINK: What specifically are you thinking about? Give me the one thing holding you back and let me address it directly.",
+        "COMPARE FIRST: Go ahead. I am confident in what I built for you. Come back with what you find and I will match it point for point.",
+        "TOO EXPENSIVE: What is the cost of NOT having this in place if something happens? That is the real number worth thinking about.",
+        "NOT THE RIGHT TIME: There is never a perfect time — but there is a real cost to waiting. Let me show you what one year of delay looks like in figures.",
+        "NEED SPOUSE: Perfect — I want to meet them too. Let us set a time when all three of us can sit down together.",
+        "NOT INTERESTED: Is it the product, the timing, or something about how I presented it? I would rather know than guess.",
+      ]},
+      close:{lbl:"Ask for the Close",items:[
+        "Alright [Name], everything checks out. Let us get this done today — what is the best way for you to proceed?",
+        "You have seen the numbers, you know the gap. The only question left is whether you want to close it now or later.",
+        "I need one thing from you to move forward: your decision. In or out — I can work with either answer.",
+        "Based on everything we have covered, this is the right move for where you want to go. Let us lock it in.",
+        "What would it take for you to say yes today? Tell me and I will make it happen.",
+      ]},
+    }},
+  I:{nm:"Influential",em:"&#10024;",col:"#D4680A",
+    sg:"This one love to talk, love people, love being liked. They will share their whole life story if you let them. Use that. Build the relationship first - everything flows naturally from there.",
+    op:'"Wah [Name]! Good to finally meet you properly. [Friend] always say good things about you. I heard you have been doing quite well in [area]?"',
+    mb:"Usually ENFP, ESFP or ENTP",
+    tr:["Enthusiastic","Social","Optimistic","Talkative","People-first"],
+    dos:["Be warm, match their energy - do not be stiff","Share client stories: my friend same situation, you know what happened...","Let them talk - show genuine interest in their life","Use humour naturally - they love people who can laugh","Drop common connections - social proof works powerfully"],
+    dnts:["Do not dump data on them - eyes glaze over immediately","Do not be cold or transactional - relationship IS the product","Do not skip the social part - straight to business feels rude","Do not make them feel alone in this - many people like you also..."],
+    st:"Warm, story-led, celebratory. Match their enthusiasm. Make the meeting feel like catching up with a friend - not a sales call.",
+    wf:"Goes quiet suddenly? You said something transactional - warm it up. Looking around the room? Tell a story or ask about them personally.",
+    fu:"WhatsApp works great. Reference something personal from last meeting. Eh [Name], hope your [thing they mentioned] went well! Following up on our chat...",
+    msgs:{
+      engage:{lbl:"Engage & Open",items:[
+        "Eh [Name]! Was so great catching up. You remind me of another client — same energy, same stage of life. The thing I helped them with — I think it applies to you too leh.",
+        "You know what I keep thinking about after our chat? The thing you said about [topic]. That actually points to something important I want to share with you.",
+        "[Name] your story is quite inspiring sia. That is exactly why what I do matters — I want to make sure people like you are properly protected while building all this.",
+        "I shared what you told me with my colleague (without names lah) and he said — eh this one really needs sorting soon. Let me share why.",
+        "Been thinking about you since we met. I have a story about someone in your exact situation — ended up changing everything for them. Can I share it?",
+      ]},
+      appt:{lbl:"Set Next Appointment",items:[
+        "Eh let us catch up properly! I will bring the full picture — you bring the coffee order haha. When are you free?",
+        "[Name], I have something really exciting to show you. The kind of thing you will want to tell your friends about. Coffee this [Day]?",
+        "Let us make it a proper session — not rushed. I will clear my schedule for you. [Day] work?",
+        "Your friend [mutual contact] says hi by the way! Let us meet up — I have got stuff to show you that is relevant to your life right now.",
+        "Can we lock in [Day]? I want to show you something in person — it hits differently than over WhatsApp.",
+      ]},
+      followup:{lbl:"Follow-Up Messages",items:[
+        "Eh [Name]! Hope [thing they mentioned] went well! Been meaning to follow up — got something to share that I think you will find really interesting.",
+        "Hey! Just saw something that reminded me of what you shared. Think you should see this. When can we catch up?",
+        "[Name] thinking of you! How did [event] go? Also — quick question on what we discussed. Got a minute?",
+        "Hey just checking in! No pressure at all — just wanted to make sure you are doing well and see if you had any questions.",
+        "Wah [Name] time flies sia. It has been [X] weeks! Let me know when you want to continue — I have got updates for you.",
+      ]},
+      objections:{lbl:"Handle Objections",items:[
+        "WANT TO THINK: Of course! Let me share what happened with a client in the same situation — ended up being the best decision they made.",
+        "TOO EXPENSIVE: It is not about the amount — it is about what it means for the people you care about. Let me show you what I mean.",
+        "NOT INTERESTED: No worries at all! Can I ask — was it anything I said or just not the right time? Just want to learn.",
+        "NEED SPOUSE: Yes! Bring them along next time. I love meeting the whole family — the more the merrier honestly.",
+        "ALREADY HAVE COVERAGE: Most people who say that have gaps they do not know about. Let me just do a quick check — no commitment.",
+        "FRIEND SAID NOT WORTH IT: Your situation is different from your friend — let me show you why what I built is specifically for you.",
+      ]},
+      close:{lbl:"Ask for the Close",items:[
+        "Honestly [Name] I am quite excited for you. This is going to make such a difference. Shall we get it sorted today?",
+        "You know what I love about working with people like you? You actually get it. Let us make it official — how do you want to proceed?",
+        "The clients who moved forward always say they wish they did it sooner. Let us do this.",
+        "I just need your go-ahead and I will handle everything from here. What do you say?",
+        "Imagine telling your friends — eh I finally sorted this out. That day can be today. Shall we?",
+      ]},
+    }},
+  S:{nm:"Steady",em:"&#128737;",col:"#1A7A40",
+    sg:"This one is the ultimate long-term client - loyal like nobody business once they trust you. But do not rush. Too pushy and they will quietly disappear. Slow down, be consistent, always involve the family.",
+    op:'"[Name], thank you for making time ah. Before we start, just want you to know - today no pressure one. I just want to understand your situation better first, can?"',
+    mb:"Usually ISFJ, ESFJ or ISTJ",
+    tr:["Loyal","Patient","Calm","Family-centred","Risk-averse"],
+    dos:["Slow down your pace - match their calm energy completely","Build trust first - do not pitch until they are comfortable with you","Always involve the spouse or family - decisions made together","Emphasise security and certainty - this protects you no matter what","Give them time - never pressure a decision in the same meeting"],
+    dnts:["Never rush or pressure - they will quietly disappear","Do not skip relationship-building to get to product faster","Do not talk big changes - frame as protecting what they have","Never argue - they avoid conflict and will just avoid you instead"],
+    st:"Calm, patient, family-anchored. Let silences breathe - they need processing time. Always anchor to protecting your family, not just growing your wealth.",
+    wf:"Goes very still and quiet? Uncomfortable - slow down and check in gently. Shoulders tense? You moved too fast - reassure and step back.",
+    fu:"WhatsApp is fine but be warm. Always check in on something personal first. Never pressure for a decision via message. If slow to reply, give space - do not double message.",
+    msgs:{
+      engage:{lbl:"Engage & Open",items:[
+        "[Name], no rush at all. I just want to make sure whatever we do genuinely fits your situation and your family. Can we take our time and go through it properly?",
+        "You mentioned [concern]. That is exactly what I want to help you protect. Can I show you what that looks like in practice?",
+        "I want you to feel completely comfortable before we go any further. Is there anything from our last conversation you are still unsure about?",
+        "Most clients at your stage just want something simple, reliable, and that they do not have to worry about. That is exactly what I want to build for you.",
+        "I am not here to push anything. I just want to make sure you and your family are in a good position no matter what happens. Can we explore that together?",
+      ]},
+      appt:{lbl:"Set Next Appointment",items:[
+        "[Name], when is a good time that works for both you and your spouse? I would love both of you to be there — it concerns both of you after all.",
+        "No rush at all — whenever you feel ready. What does your schedule look like this week or next?",
+        "I was thinking we could meet somewhere you are comfortable — your usual kopitiam or wherever suits you. Where do you prefer?",
+        "Let us set something up at a relaxed time — no rushing. What works best for your week?",
+        "I will leave it to you to pick the time. Whenever you feel ready, just let me know and I will make it work.",
+      ]},
+      followup:{lbl:"Follow-Up Messages",items:[
+        "Hi [Name], hope you and the family are well! Just checking in from our last chat — no pressure at all, just wanted to see if you had any thoughts.",
+        "[Name], hope everything is okay. Whenever you are ready to continue, I am here. No rush at all.",
+        "Hi [Name]! Hope [family event or thing they mentioned] went smoothly! When you have a moment, would love to catch up.",
+        "Just wanted to let you know I am still here whenever you are ready. Take your time — I am not going anywhere.",
+        "[Name], I was thinking about your situation and just wanted to share one thing: [reassurance or point]. Hope that helps. Talk soon.",
+      ]},
+      objections:{lbl:"Handle Objections",items:[
+        "NEED TO THINK: Of course — take the time you need. Can I ask what specifically you would like to think over? I want to make sure I have answered everything.",
+        "NEED SPOUSE AGREEMENT: Absolutely — let us set a time when all three of us can sit down properly. I do not want you deciding without them.",
+        "WORRIED ABOUT COMMITMENT: Let us go through exactly what the commitment looks like step by step — nothing locked in until you are fully comfortable.",
+        "FEELS LIKE A LOT: Let us slow down and take it one piece at a time. What part feels most important to you right now?",
+        "NOT SURE IF AFFORDABLE: Let us look at the numbers together slowly. Whatever we do needs to fit comfortably — not strain anything.",
+        "WHAT IF COMPANY SHUTS DOWN: Really good question. Let me walk you through exactly how your money is protected — it is more secure than most people realise.",
+      ]},
+      close:{lbl:"Ask for the Close",items:[
+        "[Name], I feel like we have covered everything thoroughly. Do you feel ready to move forward — at your own pace?",
+        "From everything we have discussed, I genuinely believe this is the right protection for your family. Shall we get it sorted so you can stop worrying?",
+        "Is there anything at all that is still making you hesitate? I want to address every concern before we go ahead.",
+        "This will give you and your family peace of mind for years to come. Whenever you feel ready, just say the word.",
+        "You have been so thoughtful about this — I really respect that. I think you already know this is the right thing to do. Shall we?",
+      ]},
+    }},
+  C:{nm:"Conscientious",em:"&#128300;",col:"#1A5F8A",
+    sg:"This one kiasu in the best possible way - will research everything, ask every question, take their time. Do not fight it. Be the most prepared person in the room. Clean numbers plus solid logic equals incredibly loyal client.",
+    op:'"[Name], I have prepared a full breakdown based on what you shared. Before I show you - any specific area you want me to make sure I cover?"',
+    mb:"Usually INTJ, INTP or ISTJ",
+    tr:["Analytical","Detail-focused","Systematic","Kiasu (best way)","Quality-driven"],
+    dos:["Come fully prepared - full data, source documents, no gaps","Be precise - let me confirm and get back to you beats guessing","Give them time to review - never talk while they are reading","Welcome every question - it means they are seriously considering","Use facts - per MAS regulation, historically this returned"],
+    dnts:["Never be sloppy or unprepared - instant credibility kill","Never rush their decision - time taken is a GOOD sign","Do not make big claims - they will fact-check everything","Do not rely on emotion alone - feelings do not move C-types, facts do"],
+    st:"Precise, fact-based, patient. Let them lead with questions. Never fill silence during document review - it is normal and good, do not perform enthusiasm.",
+    wf:"Stops taking notes? Lost interest or found inconsistency - pause and ask what is on their mind. Asks same detail twice? Something is off - address it head-on.",
+    fu:"Email works well - gives them something to review properly. WhatsApp fine but keep it factual. Always confirm what was discussed in writing.",
+    msgs:{
+      engage:{lbl:"Engage & Open",items:[
+        "[Name], I have put together a full breakdown based on what you shared. Before I walk you through it — is there any specific area you want me to make sure I have covered?",
+        "I pulled the actual data on the product you asked about. Let me walk you through the real numbers — not the brochure version.",
+        "Good question you raised last time about [detail]. I went back and checked — here is the precise answer with the source.",
+        "I know you like to have all the information before deciding. I have prepared a full comparison. Want to go through it point by point?",
+        "I want to be upfront — there are three things about your current plan that do not add up. I have documented all three with the figures. Can I walk you through them?",
+      ]},
+      appt:{lbl:"Set Next Appointment",items:[
+        "[Name], I have the full proposal ready with all figures and documentation. Can we meet [Day] at [Time] to go through it properly?",
+        "I will send you a summary before we meet so you can read it at your own pace first. Then when we sit down, you can ask me anything. Does [Day] work?",
+        "I want to bring the actual policy document so you can read the exact terms yourself. When are you free?",
+        "I have run three different scenarios based on your situation. It will take about 45 minutes to go through everything properly — when works?",
+        "Let us schedule properly — not rushed. I want you to have time to ask every question. What day gives you the most headspace?",
+      ]},
+      followup:{lbl:"Follow-Up Messages",items:[
+        "[Name], following up on our meeting. I have written a summary of everything we discussed and attached it here for your reference. Let me know if any figures need clarification.",
+        "Hi [Name], did you get a chance to review what I sent? No rush — just want to make sure you have everything you need to make a properly informed decision.",
+        "[Name], I checked on the specific question you raised about [detail]. Here is the exact answer with the source. Happy to clarify further.",
+        "Just a note — the figures I quoted are valid until [date]. Wanted to make sure you had that information.",
+        "Hi [Name], I have updated the comparison table based on the additional info you gave me. The numbers now reflect your exact situation.",
+      ]},
+      objections:{lbl:"Handle Objections",items:[
+        "WANT TO COMPARE: Please do. Here is a checklist of the exact criteria you should compare — I have already filled in my proposal against each point.",
+        "RETURNS NOT HIGH ENOUGH: Fair concern. Let me show you the audited 10-year track record and break down exactly where the returns come from.",
+        "HIDDEN FEES: Let me show you the full fee disclosure document — every charge itemised. Take your time to read it.",
+        "NEED MORE TIME TO STUDY: Of course. I will prepare a full written summary — everything we discussed, all figures, exact terms. Study it at your own pace.",
+        "FRIEND GOT BETTER RETURNS: Can you find out exactly what product and period? I will do a proper like-for-like comparison — same basis, not assumptions.",
+        "WHAT IF I NEED TO STOP MIDWAY: Let me show you the surrender values at each year — I have the table here. No assumptions, just actual numbers.",
+      ]},
+      close:{lbl:"Ask for the Close",items:[
+        "[Name], we have gone through all the details thoroughly. Is there any remaining question you have not yet had answered? I want to be sure before we proceed.",
+        "Based on your criteria — protection, returns, and flexibility — this proposal meets all three. Want to walk through the checklist one more time?",
+        "I can provide everything in writing before you sign — full summary, key terms, all figures. Once you are satisfied, shall we proceed?",
+        "You have had all the information for [X] days now. What is the remaining gap between where you are and a decision?",
+        "If there is one last concern standing between you and moving forward, tell me what it is and I will address it with documentation — not just words.",
+      ]},
+    }}
+};
+
+// ── STATE ──
+var scr=0; // current screen: 0=home, 1=Q1-4, 2=Q5-8, 3-7=NV groups, 8=result
+var ans=new Array(8).fill(null);
+var ckNV={};
+var info={};
+var notes="";
+var pf=null;
+var TOTAL=2+NVG.length; // 2 Q screens + 5 NV screens = 7
+
+// ── TOAST ──
+function toast(msg){
+  var t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("on");
+  setTimeout(function(){t.classList.remove("on");},2500);
+}
+
+// ── NOTES ──
+function openNotes(){document.getElementById("nta").value=notes;document.getElementById("mbg").classList.add("on");}
+function saveNotes(){notes=document.getElementById("nta").value;document.getElementById("mbg").classList.remove("on");toast("Notes saved");}
+
+// ── NAVIGATION ──
+function go(n){
+  scr=n;
+  window.scrollTo(0,0);
+  var app=document.getElementById("app");
+  var bot=document.getElementById("bot");
+  var prg=document.getElementById("prg");
+  var sub=document.getElementById("hSub");
+
+  if(n===0){
+    prg.style.display="none";
+    sub.textContent="DISC x MBTI Auto-Profile";
+    app.innerHTML=homeHTML();
+    bot.innerHTML='<button class="bnx" style="width:100%" onclick="startForm()">Start Profiling &#8594;</button>';
+  } else if(n===1||n===2){
+    prg.style.display="block";
+    updatePrg(n);
+    sub.textContent="Profiling "+(info.name||"prospect");
+    var batch=n===1?[0,1,2,3]:[4,5,6,7];
+    app.innerHTML=qHTML(batch,n);
+    var allDone=batch.every(function(i){return ans[i]!==null;});
+    bot.innerHTML='<button class="bbk" onclick="goBack()">&#8592; Back</button><button class="bnx" id="btnNext" onclick="goNext()" '+(allDone?"":"disabled")+'>Next &#8594;</button>';
+  } else if(n>=3&&n<=TOTAL){
+    prg.style.display="block";
+    updatePrg(n);
+    sub.textContent="Profiling "+(info.name||"prospect");
+    var gi=n-3;
+    app.innerHTML=nvHTML(gi);
+    var isLast=(n===TOTAL);
+    bot.innerHTML='<button class="bbk" onclick="goBack()">&#8592; Back</button><button class="bnx" onclick="goNext()">'+(isLast?"Generate Profile &#8594;":"Next &#8594;")+'</button>';
+  } else if(n==="R"){
+    prg.style.display="none";
+    sub.textContent=(info.name||"Prospect")+" &middot; Profile Ready";
+    app.innerHTML=resultHTML();
+    bot.innerHTML="";
+  }
+}
+
+function updatePrg(n){
+  var pc=Math.round(n/TOTAL*100);
+  document.getElementById("pFill").style.width=pc+"%";
+  document.getElementById("sLbl").textContent="Step "+n+" of "+TOTAL;
+  document.getElementById("pcLbl").textContent=pc+"%";
+}
+
+function startForm(){
+  info={
+    adv:document.getElementById("iAdv").value.trim()||"Advisor",
+    name:document.getElementById("iNm").value.trim()||"Prospect",
+    age:document.getElementById("iAg").value,
+    meeting:document.getElementById("iMt").value,
+    occ:document.getElementById("iOc").value.trim()
+  };
+  go(1);
+}
+
+function goNext(){
+  if(scr===TOTAL){pf=calcPf();go("R");}
+  else{go(scr+1);}
+}
+
+function goBack(){
+  if(scr==="R"||scr<=1){go(0);}
+  else{go(scr-1);}
+}
+
+// ── HOME HTML ──
+function homeHTML(){
+  return '<div style="text-align:center;padding:20px 0 18px">'
+    +'<div style="font-size:42px;margin-bottom:8px">&#127919;</div>'
+    +'<div style="font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-family:sans-serif;margin-bottom:6px">Prospect Profiling</div>'
+    +'<h1 style="font-size:20px;font-weight:normal;margin-bottom:5px">Read Any Prospect</h1>'
+    +'<p style="font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.6">8 questions + body language = instant DISC &amp; MBTI profile</p>'
+    +'</div>'
+    +'<div class="card">'
+    +'<span class="ey">Your Details</span>'
+    +'<label class="lbl" style="margin-top:0">Your Name (Advisor)</label>'
+    +'<input type="text" id="iAdv" value="'+(info.adv&&info.adv!=="Advisor"?escH(info.adv):"")+'" placeholder="Your name" autocomplete="off">'
+    +'<span class="ey" style="margin-top:14px">Prospect Details</span>'
+    +'<label class="lbl" style="margin-top:4px">Prospect Name</label>'
+    +'<input type="text" id="iNm" value="'+(info.name&&info.name!=="Prospect"?escH(info.name):"")+'" placeholder="Wei Jie, Priya, Ahmad..." autocomplete="off">'
+    +'<div class="g2">'
+    +'<div><label class="lbl" style="margin-top:0">Age Range</label>'
+    +'<select id="iAg"><option value="">Select...</option>'
+    +['20-25','26-30','31-35','36-40','41-45','46+'].map(function(a){return'<option'+(info.age===a?' selected':'')+'>'+a+'</option>';}).join('')
+    +'</select></div>'
+    +'<div><label class="lbl" style="margin-top:0">Meeting #</label>'
+    +'<select id="iMt">'
+    +'<option value="1"'+(info.meeting==="1"?' selected':'')+'>1st - Opening</option>'
+    +'<option value="2"'+(info.meeting==="2"?' selected':'')+'>2nd - Presentation</option>'
+    +'<option value="3"'+(info.meeting==="3"?' selected':'')+'>3rd - Closing</option>'
+    +'<option value="4"'+(info.meeting==="4"?' selected':'')+'>Servicing</option>'
+    +'</select></div>'
+    +'</div>'
+    +'<label class="lbl" style="margin-top:10px">Occupation / Industry</label>'
+    +'<input type="text" id="iOc" value="'+escH(info.occ||"")+'" placeholder="Engineer, Self-employed, Teacher..." autocomplete="off">'
+    +'</div>'
+    +'<div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);border-radius:12px;padding:13px 15px;margin-bottom:20px">'
+    +'<div class="ey" style="margin-bottom:6px">How it works</div>'
+    +'<div style="font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.8">1. Answer 8 profiling questions<br>2. Tick body language signals<br>3. Get instant DISC + MBTI profile<br>4. Download report or save to CSV</div>'
+    +'</div>';
+}
+
+function escH(s){return s.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+
+// ── QUESTION HTML ──
+function qHTML(batch,pn){
+  var h='<span class="ey">Questions '+(pn===1?'1-4':'5-8')+'</span>'
+    +'<h2 style="font-size:19px;font-weight:normal;margin-bottom:4px">Profiling '+escH(info.name||'prospect')+'</h2>'
+    +'<p style="font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.6;margin-bottom:16px">Weave into conversation. Pick the best match.</p>';
+  batch.forEach(function(qi){
+    var q=QS[qi];
+    var pc=q.ph==="open"?"po":"pd";
+    var pl=q.ph==="open"?"Opening":"Discovery";
+    h+='<div style="margin-bottom:22px">'
+      +'<span class="ptag '+pc+'">'+pl+'</span>'
+      +'<p class="qtip">&#128161; '+q.tip+'</p>'
+      +'<div class="qask">'+q.ask+'</div>';
+    q.opts.forEach(function(o,oi){
+      var sel=ans[qi]&&ans[qi].oi===oi;
+      h+='<div class="opt'+(sel?' s'+o.d:'')+'" data-qi="'+qi+'" data-oi="'+oi+'" data-d="'+o.d+'" onclick="selO(this)">'
+        +'<div class="rc"><div class="rd"></div></div>'
+        +'<span class="otx">'+o.t+'</span>'
+        +'<span class="dbg">DISC-'+o.d+'</span>'
+        +'</div>';
+    });
+    h+='</div>';
+  });
+  return h;
+}
+
+function selO(el){
+  var qi=+el.dataset.qi, oi=+el.dataset.oi, dc=el.dataset.d;
+  ans[qi]={oi:oi,d:dc,mb:QS[qi].opts[oi].mb};
+  var batch=qi<4?[0,1,2,3]:[4,5,6,7];
+  var pn=qi<4?1:2;
+  document.getElementById("app").innerHTML=qHTML(batch,pn);
+  var allDone=batch.every(function(i){return ans[i]!==null;});
+  var btn=document.getElementById("btnNext");
+  if(btn)btn.disabled=!allDone;
+}
+
+// ── NV HTML ──
+function nvHTML(gi){
+  var g=NVG[gi];
+  var cnt=g.items.filter(function(it){return ckNV[it.id];}).length;
+  var h='<div style="display:flex;align-items:center;gap:10px;margin-bottom:11px">'
+    +'<span style="font-size:22px">'+g.em+'</span>'
+    +'<div><div style="font-size:16px">'+g.tt+'</div>'
+    +'<div style="font-size:11px;color:var(--mu);font-family:sans-serif;margin-top:1px">'+g.st+'</div></div></div>'
+    +'<p style="font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.5;margin-bottom:11px">Tick everything you observed.</p>'
+    +'<div style="font-size:11px;color:var(--gold);font-family:sans-serif;margin-bottom:10px">'
+    +(cnt===0?"Nothing ticked yet":cnt+" signal"+(cnt!==1?"s":"")+" ticked")+'</div>';
+  g.items.forEach(function(it){
+    var ticked=!!ckNV[it.id];
+    h+='<div class="nvi'+(ticked?' ck'+it.d:'')+'" data-id="'+it.id+'" data-d="'+it.d+'" data-gi="'+gi+'" onclick="tgNV(this)">'
+      +'<div class="cb">'+(ticked?'&#10003;':'')+'</div>'
+      +'<span style="font-size:13px;color:'+(ticked?'var(--tx)':'var(--mu)')+';font-family:sans-serif;line-height:1.5;flex:1">'+it.t+'</span>'
+      +(ticked?'<span class="dbg" style="display:block">DISC-'+it.d+'</span>':'')
+      +'</div>';
+  });
+  return h;
+}
+
+function tgNV(el){
+  var id=el.dataset.id, gi=+el.dataset.gi;
+  ckNV[id]=!ckNV[id];
+  document.getElementById("app").innerHTML=nvHTML(gi);
+}
+
+// ── SCORING ──
+function occNudge(dc,mb,occ){
+  if(!occ)return;
+  var o=occ.toLowerCase();
+  if(/engineer|software|developer|it |data|analyst|analytic|auditor|accountant|accounting|scientist|research|actuari|statistic|architect|cybersec|network|database|quality|tester/.test(o)){dc.C+=2;mb.T++;mb.I++;}
+  if(/sales|business dev|entrepreneur|director|ceo|md |founder|gm |general manager|managing|vp |vice president|head of|chief|partner/.test(o)){dc.D+=2;mb.E++;mb.T++;}
+  if(/market|creative|design|artist|pr |public rel|events|media|influenc|content|performer|music|fashion|photog|social media|community/.test(o)){dc.I+=2;mb.E++;mb.N++;}
+  if(/teacher|educat|lecturer|professor|nurse|nursing|social work|counsell|therapist|psycholog|hr |human res|admin|customer serv|support|care|caregiv|welfare|nonprofit|volunteer/.test(o)){dc.S+=2;mb.F++;mb.I++;}
+  if(/lawyer|attorney|legal|solicitor|finance|banker|banking|investment|fund|consultant|advisor|adviser|manager|project|operations|compliance|risk/.test(o)){dc.D++;dc.C++;mb.T++;}
+  if(/self.employ|freelanc|own business|business owner|sole prop|proprietor/.test(o)){dc.D++;dc.I++;mb.E++;}
+  if(/doctor|physician|surgeon|specialist|pharmacist|dentist|optom|medical|clinic|hospital/.test(o)){dc.C++;dc.D++;mb.T++;}
+}
+
+function calcPf(){
+  var dc={D:0,I:0,S:0,C:0},mb={E:0,I:0,T:0,F:0,J:0,P:0,S:0,N:0};
+  occNudge(dc,mb,info.occ||"");
+  ans.forEach(function(a){if(!a)return;dc[a.d]=(dc[a.d]||0)+2;mb[a.mb.v]=(mb[a.mb.v]||0)+1;});
+  NVG.forEach(function(g){g.items.forEach(function(it){if(ckNV[it.id])dc[it.d]=(dc[it.d]||0)+1;});});
+  var s=Object.entries(dc).sort(function(a,b){return b[1]-a[1];});
+  return{dc:dc,mb:mb,pri:s[0][0],sec:s[1][0],
+    mbs:(mb.E>=mb.I?"E":"I")+(mb.S>=mb.N?"S":"N")+(mb.T>=mb.F?"T":"F")+(mb.J>=mb.P?"J":"P"),
+    nvCount:Object.values(ckNV).filter(Boolean).length,
+    qCount:ans.filter(Boolean).length,
+    occUsed:info.occ||""};
+}
+
+// ── RESULT HTML ──
+function resultHTML(){
+  var p=PR[pf.pri],s=PR[pf.sec];
+  var nm=info.name;
+  var mx=Math.max.apply(null,Object.values(pf.dc));
+  var mls={"1":"1st Meeting","2":"2nd Meeting","3":"3rd Meeting","4":"Servicing"};
+  var ml=mls[info.meeting]||"1st Meeting";
+  var dt=new Date().toLocaleDateString("en-SG",{day:"2-digit",month:"short",year:"numeric"});
+  var dims=[
+    {la:"Extravert",lb:"Introvert",sa:pf.mb.E,sb:pf.mb.I},
+    {la:"Sensing",lb:"iNtuitive",sa:pf.mb.S,sb:pf.mb.N},
+    {la:"Thinking",lb:"Feeling",sa:pf.mb.T,sb:pf.mb.F},
+    {la:"Judging",lb:"Perceiving",sa:pf.mb.J,sb:pf.mb.P}
+  ];
+  var h="";
+  // Print header
+  h+='<div class="rph"><div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#C9A84C;margin-bottom:4px">Prospect Profile Report</div>'
+    +'<div style="font-size:22px;font-weight:bold">'+nm+'</div>'
+    +'<div style="font-size:12px;color:#666;margin-top:3px">Advisor: '+info.adv+' &middot; '+dt+' &middot; '+ml+'</div></div>';
+  // Hero
+  h+='<div style="border-radius:14px;overflow:hidden;border:1px solid '+p.col+'55;margin-bottom:12px">'
+    +'<div style="padding:20px 16px 14px;background:linear-gradient(135deg,'+p.col+'EE,'+p.col+'88)">'
+    +'<span style="font-size:36px;float:right">'+p.em+'</span>'
+    +'<div style="font-size:9px;letter-spacing:3px;color:rgba(255,255,255,.65);text-transform:uppercase;font-family:sans-serif;margin-bottom:4px">'+ml+' &middot; '+info.adv+' &middot; '+dt+'</div>'
+    +'<div style="font-size:22px;color:#fff;font-weight:normal;margin-bottom:2px">'+nm+'</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,.7);font-family:sans-serif;margin-bottom:10px">'+(info.occ||"")+(info.age?" &middot; Age "+info.age:"")+'</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:7px">'
+    +'<span style="padding:4px 12px;border-radius:20px;font-family:sans-serif;font-size:11px;font-weight:700;background:rgba(255,255,255,.22);color:#fff">DISC-'+pf.pri+' &middot; '+p.nm+'</span>'
+    +'<span style="padding:4px 12px;border-radius:20px;font-family:sans-serif;font-size:11px;font-weight:700;background:rgba(0,0,0,.22);color:rgba(255,255,255,.8)">Secondary: '+pf.sec+' &middot; '+s.nm+'</span>'
+    +'<span style="padding:4px 12px;border-radius:20px;font-family:sans-serif;font-size:11px;font-weight:700;background:rgba(0,0,0,.22);color:rgba(255,255,255,.8)">MBTI: '+pf.mbs+' &middot; '+p.mb+'</span>'
+    +'</div></div>'
+    +'<div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.3)">'
+    +'<div style="font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-family:sans-serif;margin-bottom:5px">Advisor Quick Read</div>'
+    +'<div style="font-size:13px;color:#E8E0D0;font-family:sans-serif;line-height:1.7;font-style:italic">&ldquo;'+p.sg+'&rdquo;</div>'
+    +'</div></div>';
+  // Action buttons
+  h+='<div class="abg">'
+    +'<button class="abtn ab-pdf" onclick="dlPDF()"><span class="ai">&#128196;</span><span>Download PDF</span><span style="font-size:10px;opacity:.8;font-weight:400">via print</span></button>'
+    +'<button class="abtn ab-csv" onclick="dlCSV()"><span class="ai">&#128202;</span><span>Save CSV</span><span style="font-size:10px;opacity:.8;font-weight:400">open in Excel</span></button>'
+    +'</div>'
+    +'<button class="anotes" onclick="openNotes()">&#128221; Add / Edit Notes</button>';
+  // Opening line
+  h+='<div class="card" style="border-color:'+p.col+'44;background:'+p.col+'12">'
+    +'<span class="ey" style="color:'+p.col+'">Try This Opening Line</span>'
+    +'<div style="font-size:14px;font-family:sans-serif;line-height:1.7;font-style:italic">'+p.op+'</div>'
+    +'</div>';
+  // DISC scores
+  h+='<div class="card">';
+  if(pf.occUsed){
+    h+='<span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:10px;font-family:sans-serif;font-weight:600;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:#C9A84C;margin-bottom:10px">&#128084; Occupation factored in: '+escH(pf.occUsed)+'</span>';
+  }
+  h+='<span class="ey">DISC Score &middot; '+pf.qCount+' questions + '+pf.nvCount+' observations</span>';
+  ["D","I","S","C"].forEach(function(d){
+    h+='<div class="srow"><div class="slr"><span class="sl" style="color:'+PR[d].col+'">DISC-'+d+' &mdash; '+PR[d].nm+'</span><span class="sp">'+(pf.dc[d]||0)+' pts</span></div>'
+      +'<div class="str"><div class="sfill" style="width:'+(mx>0?Math.round((pf.dc[d]||0)/mx*100):0)+'%;background:'+PR[d].col+'"></div></div></div>';
+  });
+  // MBTI
+  h+='<div style="border-top:1px solid rgba(255,255,255,.08);margin-top:13px;padding-top:13px"><span class="ey">MBTI Result</span>';
+  dims.forEach(function(dm){
+    var tot=dm.sa+dm.sb;
+    var aWins=dm.sa>=dm.sb;
+    var winLbl=aWins?dm.la:dm.lb;
+    var loseLbl=aWins?dm.lb:dm.la;
+    var winScore=aWins?dm.sa:dm.sb;
+    var loseScore=aWins?dm.sb:dm.sa;
+    var barPc=tot>0?Math.round(winScore/tot*100):50;
+    h+='<div style="background:rgba(255,255,255,.04);border-radius:10px;padding:11px 13px;margin-bottom:9px;border:1px solid rgba(255,255,255,.07)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<span style="font-size:12px;font-weight:700;font-family:sans-serif;color:#C9A84C">'+(tot===0?"No signals yet":winLbl+" &rarr; "+winScore+" signal"+(winScore!==1?"s":""))+'</span>'
+      +'<span style="font-size:10px;font-family:sans-serif;color:#8A8070">vs '+loseLbl+(tot===0?"":' ('+loseScore+')')+'</span>'
+      +'</div>'
+      +'<div style="height:8px;background:rgba(255,255,255,.08);border-radius:4px">'
+      +'<div style="height:100%;border-radius:4px;background:#C9A84C;width:'+barPc+'%"></div></div>'
+      +'<div style="margin-top:5px;font-size:10px;font-family:sans-serif;color:#8A8070">'+(tot===0?"Answer questions to see this":"Strength: "+barPc+"%")+'</div>'
+      +'</div>';
+  });
+  h+='</div></div>';
+  // Traits
+  h+='<div class="card"><span class="ey">Personality Traits</span><div class="trwp">';
+  p.tr.forEach(function(t){h+='<span class="trp" style="background:'+p.col+'22;border:1px solid '+p.col+'55;color:'+p.col+'">'+t+'</span>';});
+  h+='</div></div>';
+  // Do/Dont
+  h+='<div class="ddg"><div class="doc"><div class="ddt gn">&check; Do This</div>';
+  p.dos.forEach(function(d){h+='<div class="di">'+d+'</div>';});
+  h+='</div><div class="dnt"><div class="ddt rd2">&times; Avoid</div>';
+  p.dnts.forEach(function(d){h+='<div class="dn">'+d+'</div>';});
+  h+='</div></div>';
+  // Style + Watch
+  h+='<div class="card"><span class="ey">How to Run This Conversation</span><p class="fup">'+p.st+'</p>'
+    +'<div class="wbox"><div class="wlbl">&#9888; Watch For &mdash; Act Immediately</div><div class="wtx">'+p.wf+'</div></div></div>';
+  // Follow up
+  h+='<div class="card" style="background:rgba(201,168,76,.06);border-color:rgba(201,168,76,.2)">'
+    +'<span class="ey">Follow-Up Style</span><p class="fup">'+p.fu+'</p></div>';
+  // Communication playbook
+  var catIcons={engage:"&#128172;",appt:"&#128197;",followup:"&#128242;",objections:"&#128737;",close:"&#9989;"};
+  var catBorders={engage:"rgba(201,168,76,.3)",appt:"rgba(26,95,138,.3)",followup:"rgba(26,122,64,.3)",objections:"rgba(192,57,43,.3)",close:"rgba(201,168,76,.4)"};
+  var catBgs={engage:"rgba(201,168,76,.07)",appt:"rgba(26,95,138,.07)",followup:"rgba(26,122,64,.07)",objections:"rgba(192,57,43,.07)",close:"rgba(201,168,76,.1)"};
+  h+='<div class="card" style="border-color:rgba(201,168,76,.3);background:rgba(201,168,76,.05)">'
+    +'<span class="ey">Communication Playbook &mdash; DISC-'+pf.pri+'</span>'
+    +'<p style="font-size:12px;color:var(--mu);font-family:sans-serif;line-height:1.6;margin-bottom:14px">Ready-to-use statements. Replace [Name], [Day], [detail] with real info. Tap any statement to copy.</p>';
+  ["engage","appt","followup","objections","close"].forEach(function(cat){
+    var sec=p.msgs[cat];
+    h+='<div style="border-radius:11px;border:1px solid '+catBorders[cat]+';background:'+catBgs[cat]+';margin-bottom:13px;overflow:hidden">'
+      +'<div style="padding:11px 13px 8px;border-bottom:1px solid rgba(255,255,255,.07)">'
+      +'<span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;font-family:sans-serif;color:var(--gold);font-weight:700">'+catIcons[cat]+' '+sec.lbl+'</span></div>';
+    sec.items.forEach(function(stmt,si){
+      var sid="s_"+cat+"_"+si;
+      h+='<div id="'+sid+'" onclick="cpStmt(this)" style="padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:flex-start;gap:9px">'
+        +'<span style="font-size:10px;color:var(--mu);font-family:sans-serif;flex-shrink:0;margin-top:2px;font-weight:700">'+(si+1)+'.</span>'
+        +'<span class="stmt-txt" style="font-size:13px;color:var(--tx);font-family:sans-serif;line-height:1.6;flex:1">'+stmt+'</span>'
+        +'<span style="font-size:10px;color:var(--mu);font-family:sans-serif;flex-shrink:0;margin-top:2px">&#128203;</span>'
+        +'</div>';
+    });
+    h+='</div>';
+  });
+  h+='</div>';
+  // Notes
+  h+='<div class="card"><span class="ey">Notes</span>'
+    +'<p style="font-size:13px;color:var(--mu);font-family:sans-serif;font-style:italic" id="notePrint">'+(notes||"No notes added yet.")+'</p></div>';
+  // Reset
+  h+='<button class="arst" onclick="resetAll()">&#8592; Profile Another Prospect</button>';
+  return h;
+}
+
+// ── ACTIONS ──
+function cpStmt(el){
+  var txt=el.querySelector(".stmt-txt").textContent;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(function(){
+      el.style.background="rgba(201,168,76,.15)";
+      setTimeout(function(){el.style.background="";},700);
+      toast("Copied!");
+    });
+  } else {
+    var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand("copy");document.body.removeChild(ta);
+    toast("Copied!");
+  }
+}
+
+function dlPDF(){
+  var np=document.getElementById("notePrint");
+  if(np)np.textContent=notes||"No notes added.";
+  setTimeout(function(){window.print();},80);
+}
+
+function dlCSV(){
+  if(!pf){toast("No profile yet");return;}
+  var dt=new Date().toISOString().slice(0,10);
+  var hdr="Date,Advisor,Prospect,Age,Occupation,Meeting,DISC Primary,DISC Secondary,MBTI,Score D,Score I,Score S,Score C,Questions,Observations,Notes";
+  var row=[dt,info.adv,info.name,info.age,info.occ,info.meeting,pf.pri,pf.sec,pf.mbs,
+    pf.dc.D||0,pf.dc.I||0,pf.dc.S||0,pf.dc.C||0,pf.qCount,pf.nvCount,
+    '"'+notes.replace(/"/g,'""')+'"'].join(",");
+  var blob=new Blob([hdr+"\n"+row],{type:"text/csv"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="profile_"+info.name.replace(/\s+/g,"_")+"_"+dt+".csv";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast("CSV saved");
+}
+
+function resetAll(){
+  ans=new Array(8).fill(null);
+  ckNV={};info={};notes="";pf=null;
+  go(0);
+}
+
+// ── INIT ──
+go(0);
+</script>
+</body>
+</html>
