@@ -36,7 +36,8 @@ function homeHTML() {
     + '<div style="background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.18);border-radius:12px;padding:13px 15px;margin-bottom:20px">'
     + '<div class="ey" style="margin-bottom:6px">How it works</div>'
     + '<div style="font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.8">1. Answer 8 profiling questions<br>2. Tick body language signals<br>3. Get instant DISC + MBTI profile<br>4. Save to database or download</div>'
-    + '</div>';
+    + '</div>'
+    + '<button class="bnx" style="width:100%;margin-bottom:20px" onclick="startForm()">Start Profiling &#8594;</button>';
 }
 
 function qHTML(batch, pn) {

@@ -66,7 +66,6 @@ async function route() {
   if (hash === "#/home" || hash === "" || hash === "#/") {
     inProfileFlow = false;
     go(0);
-    renderNavBar();
     return;
   }
 

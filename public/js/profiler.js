@@ -34,7 +34,7 @@ function go(n) {
     prg.style.display = "none";
     sub.textContent = "DISC \u00d7 MBTI \u00b7 Auto-Profile";
     app.innerHTML = homeHTML();
-    bot.innerHTML = '<button class="bnx" style="width:100%" onclick="startForm()">Start Profiling &#8594;</button>';
+    renderNavBar();
   } else if (n === 1 || n === 2) {
     inProfileFlow = true;
     prg.style.display = "block";
