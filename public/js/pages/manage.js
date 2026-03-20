@@ -39,7 +39,7 @@ async function renderManageAccounts() {
   }
 
   app.innerHTML = h;
-  renderNavBar();
+  renderHeaderRight();
 }
 
 // ── ROLE SETTINGS ──
@@ -88,5 +88,5 @@ function renderRoleSettings() {
     + '</div></div>';
 
   document.getElementById("app").innerHTML = h;
-  renderNavBar();
+  renderHeaderRight();
 }

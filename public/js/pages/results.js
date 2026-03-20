@@ -79,7 +79,7 @@ function renderResultsList() {
   }
 
   app.innerHTML = h;
-  renderNavBar();
+  renderHeaderRight();
 }
 
 function viewResult(id) {

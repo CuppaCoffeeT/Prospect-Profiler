@@ -34,7 +34,8 @@ function go(n) {
     prg.style.display = "none";
     sub.textContent = "DISC \u00d7 MBTI \u00b7 Auto-Profile";
     app.innerHTML = homeHTML();
-    renderNavBar();
+    bot.innerHTML = "";
+    renderHeaderRight();
   } else if (n === 1 || n === 2) {
     inProfileFlow = true;
     prg.style.display = "block";
@@ -89,7 +90,7 @@ function goBack() {
   if (scr === "R" || scr <= 1) {
     inProfileFlow = false;
     go(0);
-    renderNavBar();
+    renderHeaderRight();
   } else { go(scr - 1); }
 }
 
@@ -143,5 +144,5 @@ function resetAll() {
   ckNV = {}; info = {}; notes = ""; pf = null;
   inProfileFlow = false;
   go(0);
-  renderNavBar();
+  renderHeaderRight();
 }

@@ -48,7 +48,7 @@ function renderAccount() {
     + '<button class="arst" style="color:var(--D);border-color:rgba(192,57,43,.3)" onclick="doLogout()">Sign Out</button>';
 
   app.innerHTML = h;
-  renderNavBar();
+  renderHeaderRight();
 }
 
 async function updateAccount() {

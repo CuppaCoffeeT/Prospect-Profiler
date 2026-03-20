@@ -2,42 +2,56 @@
 
 var currentProfile = null;
 
-function renderNavBar() {
-  var bot = document.getElementById("bot");
-  if (inProfileFlow) return;
+function renderHeaderRight() {
+  var el = document.getElementById("hdrRight");
+  if (!el) return;
 
-  var hash = location.hash || "#/home";
-  var loggedIn = !!currentProfile;
-  var isManager = loggedIn && currentProfile.role === "manager";
-
-  var tabs = [
-    {hash: "#/home", icon: "&#127919;", label: "Profile"},
-  ];
-
-  if (loggedIn) {
-    tabs.push({hash: "#/results", icon: "&#128203;", label: "Results"});
-    if (isManager) {
-      tabs.push({hash: "#/manage-accounts", icon: "&#128101;", label: "Accounts"});
-      tabs.push({hash: "#/roles", icon: "&#128272;", label: "Roles"});
-    }
-    tabs.push({hash: "#/account", icon: "&#128100;", label: "Account"});
+  if (currentProfile) {
+    el.innerHTML = '<button class="hdr-burger" onclick="toggleMenu()">&#9776;</button>';
   } else {
-    tabs.push({hash: "#/login", icon: "&#128100;", label: "Login"});
+    el.innerHTML = '<button class="hdr-login" onclick="navigate(\'#/login\')">Login</button>';
   }
-
-  var h = '<div class="nav-bar">';
-  tabs.forEach(function(tab) {
-    var active = hash === tab.hash ? " active" : "";
-    h += '<button class="nav-tab' + active + '" onclick="navigate(\'' + tab.hash + '\')">'
-      + '<span class="nav-icon">' + tab.icon + '</span>'
-      + '<span>' + tab.label + '</span>'
-      + '</button>';
-  });
-  h += '</div>';
-  bot.innerHTML = h;
 }
 
-function renderAuthBot() {
+function toggleMenu() {
+  var pop = document.getElementById("menuPopover");
+  var ov = document.getElementById("menuOverlay");
+  var isOpen = pop.classList.contains("on");
+  if (isOpen) {
+    closeMenu();
+  } else {
+    var isManager = currentProfile && currentProfile.role === "manager";
+    var h = '<button class="menu-item" onclick="menuNav(\'#/home\')"><span class="mi-icon">&#127919;</span>Profiling</button>'
+      + '<button class="menu-item" onclick="menuNav(\'#/results\')"><span class="mi-icon">&#128203;</span>Results</button>';
+    if (isManager) {
+      h += '<button class="menu-item" onclick="menuNav(\'#/manage-accounts\')"><span class="mi-icon">&#128101;</span>Manage Accounts</button>'
+        + '<button class="menu-item" onclick="menuNav(\'#/roles\')"><span class="mi-icon">&#128272;</span>Role Settings</button>';
+    }
+    h += '<button class="menu-item" onclick="menuNav(\'#/account\')"><span class="mi-icon">&#9881;</span>Account Settings</button>'
+      + '<div class="menu-sep"></div>'
+      + '<button class="menu-item danger" onclick="doLogout()"><span class="mi-icon">&#10140;</span>Log Out</button>';
+    pop.innerHTML = h;
+    pop.classList.add("on");
+    ov.classList.add("on");
+  }
+}
+
+function closeMenu() {
+  document.getElementById("menuPopover").classList.remove("on");
+  document.getElementById("menuOverlay").classList.remove("on");
+}
+
+function menuNav(hash) {
+  closeMenu();
+  navigate(hash);
+}
+
+async function doLogout() {
+  closeMenu();
+  await sb.auth.signOut();
+}
+
+function clearBot() {
   document.getElementById("bot").innerHTML = "";
 }
 
@@ -82,7 +96,8 @@ async function route() {
     } else {
       app.innerHTML = loginHTML();
     }
-    renderNavBar();
+    renderHeaderRight();
+    clearBot();
     document.getElementById("hSub").textContent = "DISC \u00d7 MBTI \u00b7 Auto-Profile";
     return;
   }
