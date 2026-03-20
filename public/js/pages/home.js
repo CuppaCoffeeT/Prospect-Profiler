@@ -120,20 +120,14 @@ function resultHTML() {
     + '<div style="font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-family:sans-serif;margin-bottom:5px">Advisor Quick Read</div>'
     + '<div style="font-size:13px;color:#E8E0D0;font-family:sans-serif;line-height:1.7;font-style:italic">&ldquo;' + p.sg + '&rdquo;</div>'
     + '</div></div>';
-  // Action buttons - conditionally show Save or Login prompt
-  if (currentProfile) {
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">'
-      + '<button class="abtn ab-save" onclick="saveToDb()"><span class="ai">&#128190;</span><span>Save</span><span style="font-size:10px;opacity:.8;font-weight:400">to database</span></button>'
-      + '<button class="abtn ab-pdf" onclick="dlPDF()"><span class="ai">&#128196;</span><span>PDF</span><span style="font-size:10px;opacity:.8;font-weight:400">via print</span></button>'
-      + '<button class="abtn ab-csv" onclick="dlCSV()"><span class="ai">&#128202;</span><span>CSV</span><span style="font-size:10px;opacity:.8;font-weight:400">download</span></button>'
-      + '</div>';
-  } else {
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
-      + '<button class="abtn ab-pdf" onclick="dlPDF()"><span class="ai">&#128196;</span><span>PDF</span><span style="font-size:10px;opacity:.8;font-weight:400">via print</span></button>'
-      + '<button class="abtn ab-csv" onclick="dlCSV()"><span class="ai">&#128202;</span><span>CSV</span><span style="font-size:10px;opacity:.8;font-weight:400">download</span></button>'
-      + '</div>'
-      + '<button class="anotes" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.3);color:var(--gold)" onclick="navigate(\'#/login\')">'
-      + '&#128100; Log in to save results &amp; keep history</button>';
+  // Action buttons - PDF + CSV only (auto-saved to DB already)
+  h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
+    + '<button class="abtn ab-pdf" onclick="dlPDF()"><span class="ai">&#128196;</span><span>PDF</span><span style="font-size:10px;opacity:.8;font-weight:400">via print</span></button>'
+    + '<button class="abtn ab-csv" onclick="dlCSV()"><span class="ai">&#128202;</span><span>CSV</span><span style="font-size:10px;opacity:.8;font-weight:400">download</span></button>'
+    + '</div>';
+  if (!currentProfile) {
+    h += '<button class="anotes" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.3);color:var(--gold)" onclick="navigate(\'#/login\')">'
+      + '&#128100; Log in to view your results history</button>';
   }
   h += '<button class="anotes" onclick="openNotes()">&#128221; Add / Edit Notes</button>';
   // Opening line
@@ -219,14 +213,13 @@ function resultHTML() {
   return h;
 }
 
-// ── SAVE TO DATABASE ──
+// ── SAVE TO DATABASE (auto-called on profile generation) ──
 async function saveToDb() {
-  if (!pf) { toast("No profile yet"); return; }
+  if (!pf) return;
   var session = await sbGetSession();
-  if (!session) { toast("Not logged in"); return; }
 
   var r = await sbSaveResult({
-    user_id: session.user.id,
+    user_id: session ? session.user.id : null,
     advisor_name: info.adv,
     prospect_name: info.name,
     age_range: info.age || null,
@@ -246,6 +239,5 @@ async function saveToDb() {
     notes: notes
   });
 
-  if (r.error) { toast("Error: " + r.error.message); }
-  else { toast("Saved to database!"); }
+  if (r.error) { console.error("Save error:", r.error.message); }
 }

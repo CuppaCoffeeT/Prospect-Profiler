@@ -60,6 +60,8 @@ function go(n) {
     sub.textContent = (info.name || "Prospect") + " \u00b7 Profile Ready";
     app.innerHTML = resultHTML();
     bot.innerHTML = "";
+    // Auto-save to database
+    saveToDb();
   }
 }
 
