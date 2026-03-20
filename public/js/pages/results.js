@@ -122,10 +122,10 @@ function viewResult(id) {
   ckNV = r.nv_observations || {};
 
   var app = document.getElementById("app");
-  app.innerHTML = resultHTML();
+  app.innerHTML = '<button onclick="renderResults()" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--mu);font-family:sans-serif;font-size:13px;cursor:pointer;margin-bottom:12px">&#8592; Back to Results</button>'
+    + resultHTML();
 
-  var bot = document.getElementById("bot");
-  bot.innerHTML = '<button class="bbk" onclick="renderResults()">&#8592; Back to Results</button>';
+  document.getElementById("bot").innerHTML = "";
 }
 
 async function deleteResult(id) {
