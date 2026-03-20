@@ -17,9 +17,16 @@ async function renderManageAccounts() {
     h += '<div class="empty-state"><div class="empty-icon">&#128100;</div><div>No accounts found.</div></div>';
   } else {
     profiles.forEach(function(p) {
-      var roleCls = p.role === "manager" ? "role-manager" : "role-advisor";
-      var roleLabel = p.role === "manager" ? "Manager" : "Advisor";
+      var isMe = currentProfile && p.id === currentProfile.id;
+      var isMgr = p.role === "manager";
+      var roleCls = isMgr ? "role-manager" : "role-advisor";
+      var roleLabel = isMgr ? "Manager" : "Advisor";
       var joinDate = new Date(p.created_at).toLocaleDateString("en-SG", {day: "2-digit", month: "short", year: "numeric"});
+      var newRole = isMgr ? "advisor" : "manager";
+      var btnLabel = isMgr ? "Demote to Advisor" : "Promote to Manager";
+      var btnStyle = isMgr
+        ? "background:rgba(192,57,43,.12);border:1px solid rgba(192,57,43,.3);color:#E74C3C"
+        : "background:rgba(26,95,138,.12);border:1px solid rgba(26,95,138,.3);color:#5BA4CF";
 
       h += '<div class="card" style="padding:14px 15px">'
         + '<div style="display:flex;align-items:center;gap:12px">'
@@ -34,7 +41,10 @@ async function renderManageAccounts() {
         + '<span class="role-badge ' + roleCls + '">' + roleLabel + '</span>'
         + '<div style="font-size:10px;color:var(--mu);font-family:sans-serif;margin-top:4px">' + joinDate + '</div>'
         + '</div>'
-        + '</div></div>';
+        + '</div>'
+        + (isMe ? '<div style="font-size:11px;color:var(--mu);font-family:sans-serif;margin-top:10px;text-align:center;font-style:italic">This is you</div>'
+          : '<button onclick="changeRole(\'' + p.id + '\',\'' + newRole + '\')" style="margin-top:10px;width:100%;padding:9px;border-radius:8px;font-family:sans-serif;font-size:12px;font-weight:600;cursor:pointer;' + btnStyle + '">' + btnLabel + '</button>')
+        + '</div>';
     });
   }
 
@@ -69,7 +79,7 @@ function renderRoleSettings() {
     + '<span style="font-size:22px">&#128081;</span>'
     + '<div>'
     + '<div style="font-size:15px;font-weight:700;font-family:sans-serif">Manager</div>'
-    + '<div style="font-size:11px;color:var(--mu);font-family:sans-serif">Promoted via SQL only</div>'
+    + '<div style="font-size:11px;color:var(--mu);font-family:sans-serif">Promoted via Manage Accounts</div>'
     + '</div></div>'
     + '<div style="font-size:12px;color:var(--mu);font-family:sans-serif;line-height:1.8">'
     + '&#10003; Everything an Advisor can do<br>'
@@ -81,12 +91,23 @@ function renderRoleSettings() {
     + '<div class="card" style="background:rgba(201,168,76,.06);border-color:rgba(201,168,76,.2)">'
     + '<span class="ey">How to Change Roles</span>'
     + '<div style="font-size:13px;color:var(--mu);font-family:sans-serif;line-height:1.7">'
-    + 'Role changes are managed via SQL in the Supabase dashboard:<br><br>'
-    + '<div style="background:rgba(0,0,0,.3);border-radius:8px;padding:10px 12px;font-family:monospace;font-size:12px;color:var(--gold);line-height:1.6;overflow-x:auto">'
-    + 'UPDATE public.profiles<br>SET role = \'manager\'<br>WHERE email = \'user@example.com\';'
-    + '</div>'
+    + 'Go to <strong>Manage Accounts</strong> from the menu. Each user card has a button to promote or demote them.'
     + '</div></div>';
 
   document.getElementById("app").innerHTML = h;
   renderHeaderRight();
+}
+
+// ── CHANGE USER ROLE ──
+async function changeRole(userId, newRole) {
+  var label = newRole === "manager" ? "promote to Manager" : "demote to Advisor";
+  if (!confirm("Are you sure you want to " + label + "?")) return;
+
+  var r = await sbUpdateRole(userId, newRole);
+  if (r.error) {
+    toast("Error: " + r.error.message);
+  } else {
+    toast("Role updated to " + newRole);
+    renderManageAccounts();
+  }
 }

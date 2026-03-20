@@ -60,3 +60,7 @@ async function sbDeleteResult(id) {
 async function sbGetAllProfiles() {
   return sb.from('profiles').select('*').order('created_at', { ascending: false });
 }
+
+async function sbUpdateRole(userId, role) {
+  return sb.from('profiles').update({ role: role }).eq('id', userId);
+}
