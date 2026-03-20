@@ -80,6 +80,12 @@ function renderResultsList() {
 
   app.innerHTML = h;
   renderHeaderRight();
+
+  // Restore focus and cursor position on search input after re-render
+  if (resultsSearch !== "") {
+    var inp = app.querySelector('.search-bar input');
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
 }
 
 function viewResult(id) {
