@@ -4,22 +4,26 @@ var currentProfile = null;
 
 function renderNavBar() {
   var bot = document.getElementById("bot");
-  if (!currentProfile || inProfileFlow) return;
+  if (inProfileFlow) return;
 
   var hash = location.hash || "#/home";
-  var isManager = currentProfile.role === "manager";
+  var loggedIn = !!currentProfile;
+  var isManager = loggedIn && currentProfile.role === "manager";
 
   var tabs = [
-    {hash: "#/home", icon: "&#127968;", label: "Home"},
-    {hash: "#/results", icon: "&#128203;", label: "Results"},
+    {hash: "#/home", icon: "&#127919;", label: "Profile"},
   ];
 
-  if (isManager) {
-    tabs.push({hash: "#/manage-accounts", icon: "&#128101;", label: "Accounts"});
-    tabs.push({hash: "#/roles", icon: "&#128272;", label: "Roles"});
+  if (loggedIn) {
+    tabs.push({hash: "#/results", icon: "&#128203;", label: "Results"});
+    if (isManager) {
+      tabs.push({hash: "#/manage-accounts", icon: "&#128101;", label: "Accounts"});
+      tabs.push({hash: "#/roles", icon: "&#128272;", label: "Roles"});
+    }
+    tabs.push({hash: "#/account", icon: "&#128100;", label: "Account"});
+  } else {
+    tabs.push({hash: "#/login", icon: "&#128100;", label: "Login"});
   }
-
-  tabs.push({hash: "#/account", icon: "&#128100;", label: "Profile"});
 
   var h = '<div class="nav-bar">';
   tabs.forEach(function(tab) {
@@ -42,38 +46,51 @@ function navigate(hash) {
 }
 
 async function route() {
-  var hash = location.hash || "#/login";
+  var hash = location.hash || "#/home";
   var app = document.getElementById("app");
   var prg = document.getElementById("prg");
   prg.style.display = "none";
 
   var session = await sbGetSession();
 
-  // Not logged in
+  // Fetch profile if logged in
+  if (session && !currentProfile) {
+    app.innerHTML = '<div class="loading-wrap"><div class="spinner"></div></div>';
+    currentProfile = await sbGetProfile(session.user.id);
+  }
   if (!session) {
     currentProfile = null;
+  }
+
+  // Public routes (no login required)
+  if (hash === "#/home" || hash === "" || hash === "#/") {
+    inProfileFlow = false;
+    go(0);
+    renderNavBar();
+    return;
+  }
+
+  // Auth pages
+  if (hash === "#/login" || hash === "#/signup" || hash === "#/forgot") {
+    if (session) {
+      location.hash = "#/home";
+      return;
+    }
     if (hash === "#/signup") {
       app.innerHTML = signupHTML();
     } else if (hash === "#/forgot") {
       app.innerHTML = forgotHTML();
     } else {
-      if (hash !== "#/login") location.hash = "#/login";
       app.innerHTML = loginHTML();
     }
-    renderAuthBot();
+    renderNavBar();
     document.getElementById("hSub").textContent = "DISC \u00d7 MBTI \u00b7 Auto-Profile";
     return;
   }
 
-  // Logged in - fetch profile if needed
-  if (!currentProfile) {
-    app.innerHTML = '<div class="loading-wrap"><div class="spinner"></div></div>';
-    currentProfile = await sbGetProfile(session.user.id);
-  }
-
-  // Redirect auth pages to home
-  if (hash === "#/login" || hash === "#/signup" || hash === "#/forgot") {
-    location.hash = "#/home";
+  // Protected routes - require login
+  if (!session) {
+    location.hash = "#/login";
     return;
   }
 
@@ -84,11 +101,7 @@ async function route() {
   }
 
   // Route to page
-  if (hash === "#/home") {
-    inProfileFlow = false;
-    go(0);
-    renderNavBar();
-  } else if (hash === "#/results") {
+  if (hash === "#/results") {
     inProfileFlow = false;
     renderResults();
   } else if (hash === "#/account") {
@@ -115,7 +128,7 @@ sb.auth.onAuthStateChange(function(event, session) {
     route();
   } else if (event === "SIGNED_OUT") {
     currentProfile = null;
-    location.hash = "#/login";
+    location.hash = "#/home";
   }
 });
 

@@ -1,8 +1,8 @@
 // ── HOME PAGE (Profiling Form) ──
 
 function homeHTML() {
-  var advName = '';
-  if (currentProfile) advName = currentProfile.full_name || currentProfile.username || '';
+  var advName = info.adv && info.adv !== "Advisor" ? info.adv : '';
+  if (!advName && currentProfile) advName = currentProfile.full_name || currentProfile.username || '';
 
   return '<div style="text-align:center;padding:20px 0 18px">'
     + '<div style="font-size:42px;margin-bottom:8px">&#127919;</div>'
@@ -119,13 +119,22 @@ function resultHTML() {
     + '<div style="font-size:9px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-family:sans-serif;margin-bottom:5px">Advisor Quick Read</div>'
     + '<div style="font-size:13px;color:#E8E0D0;font-family:sans-serif;line-height:1.7;font-style:italic">&ldquo;' + p.sg + '&rdquo;</div>'
     + '</div></div>';
-  // Action buttons - Save + PDF + CSV
-  h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">'
-    + '<button class="abtn ab-save" onclick="saveToDb()"><span class="ai">&#128190;</span><span>Save</span><span style="font-size:10px;opacity:.8;font-weight:400">to database</span></button>'
-    + '<button class="abtn ab-pdf" onclick="dlPDF()"><span class="ai">&#128196;</span><span>PDF</span><span style="font-size:10px;opacity:.8;font-weight:400">via print</span></button>'
-    + '<button class="abtn ab-csv" onclick="dlCSV()"><span class="ai">&#128202;</span><span>CSV</span><span style="font-size:10px;opacity:.8;font-weight:400">download</span></button>'
-    + '</div>'
-    + '<button class="anotes" onclick="openNotes()">&#128221; Add / Edit Notes</button>';
+  // Action buttons - conditionally show Save or Login prompt
+  if (currentProfile) {
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">'
+      + '<button class="abtn ab-save" onclick="saveToDb()"><span class="ai">&#128190;</span><span>Save</span><span style="font-size:10px;opacity:.8;font-weight:400">to database</span></button>'
+      + '<button class="abtn ab-pdf" onclick="dlPDF()"><span class="ai">&#128196;</span><span>PDF</span><span style="font-size:10px;opacity:.8;font-weight:400">via print</span></button>'
+      + '<button class="abtn ab-csv" onclick="dlCSV()"><span class="ai">&#128202;</span><span>CSV</span><span style="font-size:10px;opacity:.8;font-weight:400">download</span></button>'
+      + '</div>';
+  } else {
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
+      + '<button class="abtn ab-pdf" onclick="dlPDF()"><span class="ai">&#128196;</span><span>PDF</span><span style="font-size:10px;opacity:.8;font-weight:400">via print</span></button>'
+      + '<button class="abtn ab-csv" onclick="dlCSV()"><span class="ai">&#128202;</span><span>CSV</span><span style="font-size:10px;opacity:.8;font-weight:400">download</span></button>'
+      + '</div>'
+      + '<button class="anotes" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.3);color:var(--gold)" onclick="navigate(\'#/login\')">'
+      + '&#128100; Log in to save results &amp; keep history</button>';
+  }
+  h += '<button class="anotes" onclick="openNotes()">&#128221; Add / Edit Notes</button>';
   // Opening line
   h += '<div class="card" style="border-color:' + p.col + '44;background:' + p.col + '12">'
     + '<span class="ey" style="color:' + p.col + '">Try This Opening Line</span>'
