@@ -58,6 +58,18 @@ function navigate(hash) {
   location.hash = hash;
 }
 
+async function consumeRecoveryTokens(rawHash) {
+  var secondHash = rawHash.indexOf("#", 1);
+  if (secondHash === -1) return;
+  var fragment = rawHash.substring(secondHash + 1);
+  var params = new URLSearchParams(fragment);
+  var accessToken = params.get("access_token");
+  var refreshToken = params.get("refresh_token");
+  if (!accessToken || !refreshToken) return;
+  await sb.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+  history.replaceState(null, "", window.location.pathname + window.location.search + "#/reset");
+}
+
 async function route() {
   // Supabase appends auth tokens as a second "#" fragment on recovery links
   // (e.g. "#/reset#access_token=..."). Strip anything after the route segment.
@@ -107,6 +119,9 @@ async function route() {
 
   // Reset password page - accessible with recovery session
   if (hash === "#/reset") {
+    // Supabase's detectSessionInUrl can't parse tokens when they sit after
+    // our "#/reset" route hash, so pull them out manually and install session.
+    await consumeRecoveryTokens(rawHash);
     app.innerHTML = resetHTML();
     renderHeaderRight();
     clearBot();
