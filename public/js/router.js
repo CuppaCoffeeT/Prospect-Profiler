@@ -59,7 +59,11 @@ function navigate(hash) {
 }
 
 async function route() {
-  var hash = location.hash || "#/home";
+  // Supabase appends auth tokens as a second "#" fragment on recovery links
+  // (e.g. "#/reset#access_token=..."). Strip anything after the route segment.
+  var rawHash = location.hash || "#/home";
+  var hashParts = rawHash.split("#");
+  var hash = hashParts.length > 1 ? "#" + hashParts[1] : "#/home";
   var app = document.getElementById("app");
   var prg = document.getElementById("prg");
   prg.style.display = "none";
