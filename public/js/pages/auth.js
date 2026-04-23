@@ -2,6 +2,7 @@
 
 function loginHTML() {
   return '<div class="auth-wrap">'
+    + '<div style="margin-bottom:12px"><a href="#/home" class="auth-link" style="font-size:13px">&larr; Back to Home</a></div>'
     + '<div class="auth-logo">'
     + '<div class="logo-icon">&#127919;</div>'
     + '<div class="auth-title">Prospect Profiler</div>'
@@ -27,6 +28,7 @@ function loginHTML() {
 
 function signupHTML() {
   return '<div class="auth-wrap">'
+    + '<div style="margin-bottom:12px"><a href="#/home" class="auth-link" style="font-size:13px">&larr; Back to Home</a></div>'
     + '<div class="auth-logo">'
     + '<div class="logo-icon">&#127919;</div>'
     + '<div class="auth-title">Create Account</div>'
@@ -61,6 +63,7 @@ function signupHTML() {
 
 function forgotHTML() {
   return '<div class="auth-wrap">'
+    + '<div style="margin-bottom:12px"><a href="#/home" class="auth-link" style="font-size:13px">&larr; Back to Home</a></div>'
     + '<div class="auth-logo">'
     + '<div class="logo-icon">&#128274;</div>'
     + '<div class="auth-title">Reset Password</div>'
