@@ -23,8 +23,12 @@ async function sbLogout() {
 
 async function sbResetPassword(email) {
   return sb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + '/#/login'
+    redirectTo: window.location.origin + '/#/reset'
   });
+}
+
+async function sbUpdatePassword(newPassword) {
+  return sb.auth.updateUser({ password: newPassword });
 }
 
 async function sbGetSession() {

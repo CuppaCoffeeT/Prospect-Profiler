@@ -101,6 +101,15 @@ async function route() {
     return;
   }
 
+  // Reset password page - accessible with recovery session
+  if (hash === "#/reset") {
+    app.innerHTML = resetHTML();
+    renderHeaderRight();
+    clearBot();
+    document.getElementById("hSub").textContent = "DISC \u00d7 MBTI \u00b7 Auto-Profile";
+    return;
+  }
+
   // Protected routes - require login
   if (!session) {
     location.hash = "#/login";

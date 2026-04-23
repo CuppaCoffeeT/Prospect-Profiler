@@ -77,6 +77,34 @@ function forgotHTML() {
     + '</div>';
 }
 
+function resetHTML() {
+  return '<div class="auth-wrap">'
+    + '<div class="auth-logo">'
+    + '<div class="logo-icon">&#128274;</div>'
+    + '<div class="auth-title">Set New Password</div>'
+    + '<div class="auth-sub">Enter your new password below</div>'
+    + '</div>'
+    + '<div class="card">'
+    + '<div class="err-box" id="authErr"></div>'
+    + '<div class="success-box" id="authOk"></div>'
+    + '<label class="lbl" style="margin-top:0">New Password</label>'
+    + '<div class="pwd-row">'
+    + '<input type="password" id="aPwd" placeholder="Min 8 characters" autocomplete="new-password">'
+    + '<button class="pwd-toggle" type="button" onclick="togglePwd(\'aPwd\',this)">Show</button>'
+    + '</div>'
+    + '<div class="err-msg" id="errPwd"></div>'
+    + '<label class="lbl">Confirm New Password</label>'
+    + '<div class="pwd-row">'
+    + '<input type="password" id="aPwd2" placeholder="Re-enter password" autocomplete="new-password">'
+    + '<button class="pwd-toggle" type="button" onclick="togglePwd(\'aPwd2\',this)">Show</button>'
+    + '</div>'
+    + '<div class="err-msg" id="errPwd2"></div>'
+    + '<button class="bnx" style="width:100%;margin-top:14px" onclick="doReset()" id="btnReset">Update Password</button>'
+    + '</div>'
+    + '<div class="auth-footer"><a href="#/login" class="auth-link">&larr; Back to Sign In</a></div>'
+    + '</div>';
+}
+
 function togglePwd(id, btn) {
   var inp = document.getElementById(id);
   if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
@@ -183,4 +211,31 @@ async function doForgot() {
 
   if (r.error) { showAuthErr(r.error.message); return; }
   showAuthOk('Reset link sent! Check your email inbox.');
+}
+
+async function doReset() {
+  clearAuthMsgs();
+  var pwd = document.getElementById('aPwd').value;
+  var pwd2 = document.getElementById('aPwd2').value;
+  var valid = true;
+
+  if (!pwd || pwd.length < 8) {
+    document.getElementById('errPwd').textContent = 'Password must be at least 8 characters';
+    valid = false;
+  }
+  if (pwd !== pwd2) {
+    document.getElementById('errPwd2').textContent = 'Passwords do not match';
+    valid = false;
+  }
+  if (!valid) return;
+
+  setAuthLoading('btnReset', true);
+  var r = await sbUpdatePassword(pwd);
+  setAuthLoading('btnReset', false);
+
+  if (r.error) { showAuthErr(r.error.message); return; }
+
+  showAuthOk('Password updated! Signing you in…');
+  currentProfile = null;
+  setTimeout(function() { location.hash = '#/home'; }, 800);
 }
